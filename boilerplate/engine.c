@@ -547,6 +547,31 @@ static int cmd_stop(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
+if (argc == 5) {
+    int pid = atoi(argv[1]);
+
+    struct monitor_request req;
+    req.pid = pid;
+    strncpy(req.container_id, argv[2], sizeof(req.container_id));
+
+    req.soft_limit_bytes = atol(argv[3]);
+    req.hard_limit_bytes = atol(argv[4]);
+
+    int fd = open("/dev/container_monitor", O_RDWR);
+    if (fd < 0) {
+        perror("open");
+        return 1;
+    }
+
+    if (ioctl(fd, MONITOR_REGISTER, &req) < 0) {
+        perror("ioctl");
+        return 1;
+    }
+
+    close(fd);
+    return 0;
+}
+
     if (argc < 2) {
         usage(argv[0]);
         return 1;
