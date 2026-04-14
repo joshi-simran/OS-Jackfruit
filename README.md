@@ -251,30 +251,61 @@ Record:
 
 ## 11. Proof of Execution
 
+### 1. Device Creation
+The kernel module successfully creates the character device `/dev/container_monitor`, which is used for communication between user space and kernel space.
 
-1. **Multi-container supervision**  
-   Two or more containers running under one supervisor process.
+<img width="745" height="72" alt="image" src="https://github.com/user-attachments/assets/c44b5d24-be30-41cf-9818-d75b15953a43" />
 
-2. **Metadata tracking**  
-   Output of `engine ps` showing tracked containers and their state.
 
-3. **Logging pipeline**  
-   Log file contents captured through the logging pipeline, plus evidence of producer/consumer activity.
+---
 
-4. **CLI and IPC**  
-   A CLI command being issued and the supervisor responding.
+### 2. Process Execution and Registration
+A memory-intensive workload (`memory_hog`) is executed in the background and its PID is captured. The process is then registered with the kernel module using the `engine` interface.
 
-5. **Soft-limit warning**  
-   `dmesg` or log output showing a soft-limit warning event.
+<img width="753" height="143" alt="image" src="https://github.com/user-attachments/assets/fffb565c-4722-4ce7-9c85-5b08b487c2b5" />
 
-6. **Hard-limit enforcement**  
-   `dmesg` or log output showing a hard-limit kill and the metadata reflecting it.
 
-7. **Scheduling experiment**  
-   Terminal output or measurements showing the effect of different scheduling configurations.
+---
 
-8. **Clean teardown**  
-   Evidence that children are reaped, threads exit, and no zombies remain.
+### 3. Soft and Hard Limit Enforcement
+The kernel module correctly monitors memory usage and enforces limits:
+
+- A **soft limit warning** is logged when memory exceeds the soft threshold.
+- A **hard limit kill** is triggered when memory exceeds the hard threshold.
+
+<img width="748" height="166" alt="image" src="https://github.com/user-attachments/assets/307c23f7-9a52-4399-9ac6-d76f4ade851e" />
+
+---
+
+### 4. Process Termination
+After exceeding the hard limit, the monitored process is terminated by the kernel module, demonstrating correct enforcement.
+
+<img width="754" height="94" alt="image" src="https://github.com/user-attachments/assets/e01eba4d-131c-405c-a305-e841604ffe29" />
+
+---
+
+### 5. Multi-Process Monitoring
+Multiple processes can be registered simultaneously with different container IDs and limits. The kernel module independently tracks and enforces limits for each process.
+
+<img width="748" height="278" alt="image" src="https://github.com/user-attachments/assets/74876794-048c-45e8-8b02-db60f20e0e9b" />
+
+---
+
+### 6. Scheduler Behavior
+CPU scheduling behavior is demonstrated using multiple `cpu_hog` processes with different nice values.
+
+- Process with **nice = -10** receives higher CPU share  
+- Process with **nice = 10** receives lower CPU share  
+
+<img width="749" height="534" alt="image" src="https://github.com/user-attachments/assets/7b408696-b664-4d01-8d98-32964e44be1c" />
+
+---
+
+### 7. Clean Module Teardown
+The kernel module is successfully unloaded, ensuring that all internal data structures are cleaned up and no residual state remains.
+
+<img width="541" height="32" alt="image" src="https://github.com/user-attachments/assets/0d0d2124-8eaf-40cc-979a-49f1305c2a3e" />
+
 
 ---
 
