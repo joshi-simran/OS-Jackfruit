@@ -323,11 +323,30 @@ A long-running supervisor simplifies container management because it owns metada
 
 The project uses separate IPC paths for control and logging. Shared data structures must be protected against races because multiple threads and processes can access them at once. Mutexes are used for shared state that is accessed in process context, and producer/consumer synchronization is used for log buffering.
 
-### 12.4 Memory Management and Enforcement
+### 12.4 Logging and Synchronization 
+
+The system involves concurrent access to shared kernel data structures, particularly the monitored process list.
+
+A mutex is used to ensure mutual exclusion during insertion, deletion, and iteration operations. This prevents race conditions between the ioctl handler and the timer callback.
+
+Race conditions may occur when:
+- a process is being removed while the timer is iterating
+- a new process is added during monitoring
+
+To avoid this:
+- `list_for_each_entry_safe` is used for safe deletion during traversal
+- mutex ensures only one execution path modifies the list at a time
+
+Deadlock is avoided by:
+- using a single lock (no nested locking)
+- keeping critical sections small
+
+
+### 12.5 Memory Management and Enforcement
 
 RSS measures resident physical memory used by a process. Soft limits warn first; hard limits terminate the process. Enforcement is implemented in kernel space so that a workload cannot bypass it from user space.
 
-### 12.5 Scheduling Behavior
+### 12.6 Scheduling Behavior
 
 Linux scheduling is demonstrated by running competing workloads with different nice values or different workload types. Lower nice values receive more favorable scheduling, while I/O-bound and CPU-bound tasks behave differently under contention.
 
