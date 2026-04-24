@@ -259,15 +259,42 @@ The kernel module successfully creates the character device `/dev/container_moni
 
 ---
 
-### 2. Process Execution and Registration
+### 2. Supervisor running
+This screenshot shows the (`engine supervisor ./rootfs-base`) command starting successfully and waiting for requests. It proves that the main controller process is running and ready to manage containers.
+
+<img width="895" height="323" alt="image" src="https://github.com/user-attachments/assets/1855f845-abfb-4b3e-8e9c-5a9a5c0e4616" />
+
+---
+
+### 3. Container start
+This screenshot shows (`engine start alpha ./rootfs-alpha /bin/sh`) starting a container successfully. It proves that the runtime can create a container with its own rootfs, command, PID, and memory limits.
+
+<img width="742" height="245" alt="image" src="https://github.com/user-attachments/assets/e75fac38-d7f7-475d-bf42-f68114a0e75c" />
+
+---
+
+### 4. Engine PS 
+This screenshot shows (`engine ps`) listing the running containers with their PID, state, memory limits, start time, and log file. It proves that the supervisor is tracking container metadata correctly.
+
+<img width="945" height="255" alt="image" src="https://github.com/user-attachments/assets/f35e4ea4-80fd-4b1e-902b-ef7a3e5bb562" />
+
+---
+
+### 5. View logs of container
+This screenshot shows (`engine logs alpha`) displaying the output of the container. It proves that the logging system is working and that container output is being saved and shown correctly.
+
+<img width="754" height="308" alt="image" src="https://github.com/user-attachments/assets/840788fc-d1d2-41d2-bacb-5aa8bacb71e3" />
+
+---
+
+### 6. Process Execution and Registration
 A memory-intensive workload (`memory_hog`) is executed in the background and its PID is captured. The process is then registered with the kernel module using the `engine` interface.
 
 <img width="753" height="143" alt="image" src="https://github.com/user-attachments/assets/fffb565c-4722-4ce7-9c85-5b08b487c2b5" />
 
-
 ---
 
-### 3. Soft and Hard Limit Enforcement
+### 7. Soft and Hard Limit Enforcement
 The kernel module correctly monitors memory usage and enforces limits:
 
 - A **soft limit warning** is logged when memory exceeds the soft threshold.
@@ -277,21 +304,21 @@ The kernel module correctly monitors memory usage and enforces limits:
 
 ---
 
-### 4. Process Termination
+### 8. Process Termination
 After exceeding the hard limit, the monitored process is terminated by the kernel module, demonstrating correct enforcement.
 
 <img width="754" height="94" alt="image" src="https://github.com/user-attachments/assets/e01eba4d-131c-405c-a305-e841604ffe29" />
 
 ---
 
-### 5. Multi-Process Monitoring
+### 9. Multi-Process Monitoring
 Multiple processes can be registered simultaneously with different container IDs and limits. The kernel module independently tracks and enforces limits for each process.
 
 <img width="748" height="278" alt="image" src="https://github.com/user-attachments/assets/74876794-048c-45e8-8b02-db60f20e0e9b" />
 
 ---
 
-### 6. Scheduler Behavior
+### 10. Scheduler Behavior
 CPU scheduling behavior is demonstrated using multiple `cpu_hog` processes with different nice values.
 
 - Process with **nice = -10** receives higher CPU share  
@@ -301,7 +328,7 @@ CPU scheduling behavior is demonstrated using multiple `cpu_hog` processes with 
 
 ---
 
-### 7. Clean Module Teardown
+### 11. Clean Module Teardown
 The kernel module is successfully unloaded, ensuring that all internal data structures are cleaned up and no residual state remains.
 
 <img width="541" height="32" alt="image" src="https://github.com/user-attachments/assets/0d0d2124-8eaf-40cc-979a-49f1305c2a3e" />
