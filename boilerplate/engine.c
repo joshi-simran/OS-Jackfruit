@@ -56,8 +56,8 @@ void register_monitor(pid_t pid) {
 
     struct monitor_request req;
     req.pid = pid;
-    req.soft_limit = 40 * 1024 * 1024;
-    req.hard_limit = 64 * 1024 * 1024;
+    req.soft_limit_bytes = 40 * 1024 * 1024;
+    req.hard_limit_bytes = 64 * 1024 * 1024;
     strcpy(req.container_id, "demo");
 
     ioctl(fd, MONITOR_REGISTER, &req);
